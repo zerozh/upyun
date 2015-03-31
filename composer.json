@@ -1,0 +1,12 @@
+{
+  "name": "zerozh/upyun",
+  "description": "又拍云客户端",
+  "require": {
+    "guzzlehttp/guzzle": "~5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Upyun\\": "src/"
+    }
+  }
+}
