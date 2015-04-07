@@ -80,8 +80,8 @@ $client->mkdir('folder/subfolder1');
 $client->put('folder/subfolder2/json.json', '{"ping":"pong"}');
 $client->put('folder/subfolder3.txt', 'Hello World');
 
-// 遍历文件夹
-$files = $client->ls('folder/subfolder', **true**);
+// 递归遍历文件夹
+$files = $client->ls('folder/subfolder', true);
 foreach($files as $file){
     if ($file->isDir()) {
         foreach($file as $subfile){

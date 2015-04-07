@@ -157,7 +157,7 @@ class Client
     {
         $fileinfo = $this->head($path);
         if (!$fileinfo || $fileinfo->isFile()) {
-            throw new BadRequestException('Invalid list directory on a file');
+            throw new NotAcceptableException();
         }
 
         if ($recursive) {
@@ -175,10 +175,14 @@ class Client
     /**
      * @param string $path Remote file path
      * @return bool
+     * @throws
      */
     public function rmrf($path)
     {
         $fileinfo = $this->head($path);
+        if (!$fileinfo) {
+            throw new NotAcceptableException();
+        }
         if ($fileinfo->getType() == 'file') {
             return $this->delete($path);
         } else {
@@ -281,6 +285,7 @@ class Client
         $request->setHeader('Authorization', 'UpYun ' . $this->username . ':' . $sign);
         $request->setHeader('Date', $date);
         $request->setHeader('Expect', '');
+        $request->setHeader('User-Agent', 'Upyun PHP SDK ' . $this->version() . ' (http://github.com/zerozh/upyun/)');
         if ($folder) {
             $request->setHeader('Folder', 'true');
         }

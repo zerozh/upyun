@@ -165,31 +165,31 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'password' => $argv[3],
         ];
         $client = new Upyun\Client($options);
-        $response = $client->mkdir('multidir/001');
+        $response = $client->mkdir('complex/apple');
         $this->assertTrue($response);
 
-        $response = $client->mkdir('multidir/002/sub1');
+        $response = $client->mkdir('complex/orange/blue');
         $this->assertTrue($response);
 
-        $response = $client->mkdir('multidir/002/sub2');
+        $response = $client->mkdir('complex/orange/red');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/002/sub3/content.txt', 'Raw Content Here');
+        $response = $client->put('complex/banana/yellow/hit.txt', 'Raw Content Here');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/002/sub3/json.md', '# Markdown Example');
+        $response = $client->put('complex/banana/yellow/bit.md', '# Markdown Example');
         $this->assertTrue($response);
 
-        $response = $client->mkdir('multidir/002/sub3/subsub');
+        $response = $client->mkdir('complex/banana/yellow/eat');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/003/test.png', __DIR__ . '/Data/test.png');
+        $response = $client->put('complex/strawberry/red.png', __DIR__ . '/Data/test.png');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/003/test.txt', 'Text Test');
+        $response = $client->put('complex/strawberry/pink.txt', 'Text Test');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/004.json', '{"ping":"pong"}');
+        $response = $client->put('complex/pear.json', '{"ping":"pong"}');
         $this->assertTrue($response);
     }
 
@@ -202,17 +202,23 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'password' => $argv[3],
         ];
         $client = new Upyun\Client($options);
-        $response = $client->ls('multidir');
+        $response = $client->ls('complex');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
         foreach ($response as $item) {
             $this->assertInstanceOf('\Upyun\Util\FileInfo', $item);
         }
 
-        $response = $client->ls('multidir/002');
+        $response = $client->ls('complex/orange');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
+        foreach ($response as $item) {
+            $this->assertTrue($item->isDir());
+        }
 
-        $response = $client->ls('multidir/002/sub3');
+        $response = $client->ls('complex/strawberry');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
+        foreach ($response as $item) {
+            $this->assertTrue($item->isFile());
+        }
     }
 
     public function testMultiDirRecursiveList()
@@ -224,7 +230,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'password' => $argv[3],
         ];
         $client = new Upyun\Client($options);
-        $response = $client->ls('multidir', true);
+        $response = $client->ls('complex', true);
         foreach ($response as $n) {
             if ($n->isDir()) {
                 $this->assertInstanceOf('\Upyun\Util\Directory', $n);
@@ -251,7 +257,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'password' => $argv[3],
         ];
         $client = new Upyun\Client($options);
-        $response = $client->rmrf('multidir');
+        $response = $client->rmrf('complex');
         $this->assertTrue($response);
     }
 }
