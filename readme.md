@@ -26,13 +26,11 @@ $client->put('also.txt', 'Hello World');
 
 // 获取文件信息
 $fileinfo = $client->head('somefile.jpg');
-/**
- * 返回 `\Upyun\Util\FileInfo` 实例，支持的方法如下，参数和返回结果与 SplFileInfo 相同。
- */
-echo $fileinfo->getFilename(); // somefile.jpg
-echo $fileinfo->getMTime(); // Last Modified UNIX Timestamp
-echo $fileinfo->getSize(); // integer file size
-echo $fileinfo->getType(); // file or dir
+//返回 `\Upyun\Util\FileInfo` 实例，支持的方法如下，参数和返回结果与 SplFileInfo 相同。
+echo $fileinfo->getFilename(); // string somefile.jpg
+echo $fileinfo->getMTime(); // int UNIX Timestamp
+echo $fileinfo->getSize(); // int file size
+echo $fileinfo->getType(); // string: file|dir
 
 // 删除文件
 $client->delete('somefile.jpg');
