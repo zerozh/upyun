@@ -4,7 +4,7 @@
 
 Composer 安装：`"zerozh\upyun" : "dev-master"`
 
-本包可能会与其他使用 `Upyun` Namespace 的包冲突。
+本包可能会与其他使用 `\Upyun` Namespace 的包冲突。
 
 ## 使用
 
@@ -17,11 +17,25 @@ $client = new \Upyun\Client([
     'bucket' => 'BUCKET'
 ]);
 
-// 将本地文件 /local/path/somefile.jpg 上传到Bucket空间中的根目录下 somefile.jpg
-$client->put('somefile.jpg', '/local/path/somefile.jpg');
+// 上传文件
+$client->put('somefile.jpg', '/from/local/path/somefile.jpg');
 // 暂时只支持文件名，不支持直接传文件内容
 
-//删除文件
+// 获取文件信息
+$fileinfo = $client->head('somefile.jpg');
+/**
+ * 返回 `\Upyun\Util\FileInfo` 对象，支持的方法如下，参数和返回结果与 SplFileInfo 相同。
+ */
+echo $fileinfo->getFilename(); // somefile.jpg
+echo $fileinfo->getMTime(); // Last Modified UNIX Timestamp
+echo $fileinfo->getSize(); // integer file size
+echo $fileinfo->getType(); // file or dir
+
+// 删除文件
 $client->delete('somefile.jpg');
+
+// 创建文件夹
+$client->mkdir('folder/subfolder');
+
 ```
 
