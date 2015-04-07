@@ -48,8 +48,16 @@ $files = $client->ls('folder/subfolder');
 foreach($files as $file){
     // 每个文件都为 `\Upyun\Util\FileInfo` 实例
     echo $file->getSize();
+    // 如果遇到文件夹，需要手动遍历（暂不支持递归）
+    if($file->getType == 'dir') {
+        $files = $client->ls('folder/subfolder');
+    }
 }
+
+// 删除文件夹（递归删除所有内容）
+$client->rmrf('folder');
 ```
 
 ## 功能
-* 暂未支持图片上传设置
+* 暂未支持高级图片上传设置
+* 暂未支持递归获取文件夹

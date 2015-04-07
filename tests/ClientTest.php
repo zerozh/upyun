@@ -179,6 +179,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $response = $client->put('multidir/003/sub3/test.png', __DIR__ . '/Data/test.png');
         $this->assertTrue($response);
+
+        $response = $client->put('multidir/004/complex/test.txt', 'Hello World');
+        $this->assertTrue($response);
     }
 
     public function testMultiDirList()
@@ -213,28 +216,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'password' => $argv[3],
         ];
         $client = new Upyun\Client($options);
-        $response = $client->delete('multidir/003/sub3/test.png');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir/003/sub3');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir/003/sub2');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir/003/sub1');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir/003');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir/002');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir/001');
-        $this->assertTrue($response);
-
-        $response = $client->delete('multidir');
+        $response = $client->rmrf('multidir');
         $this->assertTrue($response);
     }
 }

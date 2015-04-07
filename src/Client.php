@@ -162,6 +162,39 @@ class Client
     }
 
     /**
+     * @param string $path Remote file path
+     * @return bool
+     */
+    public function rmrf($path)
+    {
+        $fileinfo = $this->head($path);
+        if ($fileinfo->getType() == 'file') {
+            return $this->delete($path);
+        } else {
+            return $this->recursiveDelete($path);
+        }
+    }
+
+    /**
+     * @param string $path Dir path
+     * @return bool
+     */
+    protected function recursiveDelete($path)
+    {
+        $files = $this->ls($path);
+
+        foreach ($files as $file) {
+            if ($file->getType() == 'dir') {
+                $this->recursiveDelete($path . '/' . $file->getFilename());
+            } else {
+                $this->delete($path . '/' . $file->getFilename());
+            }
+        }
+
+        return $this->delete($path);
+    }
+
+    /**
      * @param string $path
      * @return string Remote URI
      */
