@@ -22,7 +22,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Upyun\Client($options);
     }
 
-    public function testUpload()
+    public function testUploadViaContent()
+    {
+        global $argv;
+        $options = [
+            'bucket' => $argv[4],
+            'username' => $argv[2],
+            'password' => $argv[3],
+        ];
+        $client = new Upyun\Client($options);
+        $response = $client->put('test.txt', 'Hello World');
+        $this->assertTrue($response);
+    }
+
+    public function testUploadViaPath()
     {
         global $argv;
         $options = [
@@ -32,6 +45,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ];
         $client = new Upyun\Client($options);
         $response = $client->put('test.png', __DIR__ . '/Data/test.png');
+        $this->assertTrue($response);
+    }
+
+    public function testUploadViaResource()
+    {
+        global $argv;
+        $options = [
+            'bucket' => $argv[4],
+            'username' => $argv[2],
+            'password' => $argv[3],
+        ];
+        $client = new Upyun\Client($options);
+        $response = $client->put('test.jpg', fopen(__DIR__ . '/Data/test.jpg', 'r'));
+
         $this->assertTrue($response);
     }
 
@@ -48,6 +75,25 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Upyun\Util\FileInfo', $response);
         $this->assertEquals(filesize(__DIR__ . '/Data/test.png'), $response->getSize());
         $this->assertEquals('file', $response->getType());
+
+
+        $response = $client->head('test.jpg');
+        $this->assertInstanceOf('\Upyun\Util\FileInfo', $response);
+        $this->assertEquals(filesize(__DIR__ . '/Data/test.jpg'), $response->getSize());
+        $this->assertEquals('file', $response->getType());
+    }
+
+    public function testDownloadFile()
+    {
+        global $argv;
+        $options = [
+            'bucket' => $argv[4],
+            'username' => $argv[2],
+            'password' => $argv[3],
+        ];
+        $client = new Upyun\Client($options);
+        $response = $client->get('test.txt');
+        $this->assertEquals('Hello World', $response);
     }
 
     public function testDelete()
@@ -60,6 +106,12 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ];
         $client = new Upyun\Client($options);
         $response = $client->delete('test.png');
+        $this->assertTrue($response);
+
+        $response = $client->delete('test.jpg');
+        $this->assertTrue($response);
+
+        $response = $client->delete('test.txt');
         $this->assertTrue($response);
     }
 

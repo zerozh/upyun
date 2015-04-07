@@ -79,13 +79,23 @@ class Client
 
     /**
      * @param string $path Remote file path
-     * @param string $file Local file path
+     * @param string|resource $file File resource, File path or Raw content
      * @param array $options
      * @return bool
+     * @throws
      */
     public function put($path, $file, array $options = [])
     {
-        $response = $this->performRequest('PUT', $path, ['file' => $file]);
+        if (is_resource($file)) {
+            $options = ['file' => $file];
+        } elseif (is_string($file) && file_exists($file)) {
+            $options = ['file' => fopen($file, 'r')];
+        } elseif (is_string($file)) {
+            $options = ['content' => $file];
+        } else {
+            throw new BadRequestException();
+        }
+        $response = $this->performRequest('PUT', $path, $options);
         return $this->returnOrThrow($response);
     }
 
@@ -97,7 +107,7 @@ class Client
     {
         $response = $this->performRequest('GET', $path);
         if ($response->getStatusCode() == 200) {
-            return $response->getBody();
+            return (string)$response->getBody();
         } else {
             return $this->returnOrThrow($response);
         }
@@ -179,9 +189,11 @@ class Client
          */
         $filesize = 0;
         if (isset($options['file'])) {
-            $resource = fopen($options['file'], 'r');
-            $options['body'] = Stream::factory($resource);
+            $options['body'] = Stream::factory($options['file']);
             $filesize = $options['body']->getSize();
+        } elseif (isset($options['content'])) {
+            $options['body'] = $options['content'];
+            $filesize = strlen($options['body']);
         }
 
         /**
@@ -190,6 +202,7 @@ class Client
         $folder = isset($options['folder']) && $options['folder'];
         unset($options['file']);
         unset($options['folder']);
+        unset($options['content']);
 
         $date = gmdate('D, d M Y H:i:s \G\M\T');
         $sign = md5("{$method}&{$uri}&{$date}&{$filesize}&" . md5($this->password));

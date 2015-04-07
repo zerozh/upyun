@@ -18,8 +18,11 @@ $client = new \Upyun\Client([
 ]);
 
 // 上传文件
+// 可以使用文件资源，本地文件路径或纯文本直接创建文件
+// 传入字符串时，若该字符串为有效的本地文件路径，优先使用，否则为文本创建文件
 $client->put('somefile.jpg', '/from/local/path/somefile.jpg');
-// 暂时只支持文件名，不支持直接传文件内容
+$client->put('another.png', fopen('/from/local/path/another.png', 'r'));
+$client->put('also.txt', 'Hello World');
 
 // 获取文件信息
 $fileinfo = $client->head('somefile.jpg');
@@ -50,3 +53,5 @@ foreach($files as $file){
 }
 ```
 
+## 功能
+* 暂未支持图片上传设置
