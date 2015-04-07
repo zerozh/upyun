@@ -3,18 +3,20 @@ namespace Upyun\Util;
 
 class FileInfo
 {
-    protected $filename = '';
-    protected $mtime = 0;
-    protected $size = 0;
-    protected $type;
+    protected $file;
 
     public function __construct($file, $extra = [])
     {
         $file = array_merge($file, $extra);
-        $this->filename = isset($file['filename']) ? $file['filename'] : '';
-        $this->mtime = isset($file['mtime']) ? $file['mtime'] : 0;
-        $this->size = isset($file['size']) ? $file['size'] : 0;
-        $this->type = isset($file['type']) ? $file['type'] : null;
+        $this->initFile($file);
+    }
+
+    protected function initFile($file)
+    {
+        $this->file['filename'] = isset($file['filename']) ? $file['filename'] : '';
+        $this->file['mtime'] = isset($file['mtime']) ? $file['mtime'] : 0;
+        $this->file['size'] = isset($file['size']) ? $file['size'] : 0;
+        $this->file['type'] = isset($file['type']) ? $file['type'] : null;
     }
 
     /**
@@ -22,7 +24,7 @@ class FileInfo
      */
     public function getFilename()
     {
-        return $this->filename;
+        return $this->file['filename'];
     }
 
     /**
@@ -30,7 +32,7 @@ class FileInfo
      */
     public function getType()
     {
-        return $this->type;
+        return $this->file['type'];
     }
 
     /**
@@ -38,7 +40,7 @@ class FileInfo
      */
     public function getMTime()
     {
-        return $this->mtime;
+        return $this->file['mtime'];
     }
 
     /**
@@ -46,7 +48,7 @@ class FileInfo
      */
     public function getSize()
     {
-        return $this->size;
+        return $this->file['size'];
     }
 
     /**

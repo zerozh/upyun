@@ -140,6 +140,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $client = new Upyun\Client($options);
         $response = $client->ls('multidir');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
+        foreach ($response as $item) {
+            $this->assertInstanceOf('\Upyun\Util\FileInfo', $item);
+            $this->assertEquals('dir', $item->getType());
+        }
 
         $response = $client->ls('multidir/002');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);

@@ -1,24 +1,55 @@
 <?php
 namespace Upyun\Util;
 
-class Directory
+use OutOfBoundsException;
+
+class Directory extends FileInfo implements \Countable, \SeekableIterator
 {
     protected $files = [];
+    protected $position;
 
     public function __construct($files)
     {
-        foreach ($files as $file) {
-            $this->files[] = new FileInfo($file);
-        }
+        $this->files = $files;
     }
 
-    /**
-     * Get All files
-     * @return \Upyun\Util\FileInfo[]
-     */
-    public function getFiles()
+    public function key()
     {
-        return $this->files;
+        return $this->position;
+    }
+
+    public function next()
+    {
+        ++$this->position;
+    }
+
+    public function rewind()
+    {
+        $this->position = 0;
+    }
+
+    public function current()
+    {
+        return new FileInfo($this->files[$this->position]);
+    }
+
+    public function seek($position)
+    {
+        if (!isset($this->files[$position])) {
+            throw new OutOfBoundsException("invalid seek position ($position)");
+        }
+
+        $this->position = $position;
+    }
+
+    public function valid()
+    {
+        return array_key_exists($this->position, $this->files);
+    }
+
+    public function count()
+    {
+        return count($this->files);
     }
 
     /**

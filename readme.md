@@ -24,7 +24,7 @@ $client->put('somefile.jpg', '/from/local/path/somefile.jpg');
 // 获取文件信息
 $fileinfo = $client->head('somefile.jpg');
 /**
- * 返回 `\Upyun\Util\FileInfo` 对象，支持的方法如下，参数和返回结果与 SplFileInfo 相同。
+ * 返回 `\Upyun\Util\FileInfo` 实例，支持的方法如下，参数和返回结果与 SplFileInfo 相同。
  */
 echo $fileinfo->getFilename(); // somefile.jpg
 echo $fileinfo->getMTime(); // Last Modified UNIX Timestamp
@@ -37,5 +37,16 @@ $client->delete('somefile.jpg');
 // 创建文件夹
 $client->mkdir('folder/subfolder');
 
+// 添加一些文件
+$client->put('folder/subfolder/1.jpg', '/from/local/path/1.jpg');
+$client->put('folder/subfolder/2.jpg', '/from/local/path/2.jpg');
+$client->put('folder/subfolder/3.jpg', '/from/local/path/3.jpg');
+
+// 遍历文件夹
+$files = $client->ls('folder/subfolder');
+foreach($files as $file){
+    // 每个文件都为 `\Upyun\Util\FileInfo` 实例
+    echo $file->getSize();
+}
 ```
 
