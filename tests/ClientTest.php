@@ -168,19 +168,28 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $response = $client->mkdir('multidir/001');
         $this->assertTrue($response);
 
-        $response = $client->mkdir('multidir/002');
+        $response = $client->mkdir('multidir/002/sub1');
         $this->assertTrue($response);
 
-        $response = $client->mkdir('multidir/003/sub1');
+        $response = $client->mkdir('multidir/002/sub2');
         $this->assertTrue($response);
 
-        $response = $client->mkdir('multidir/003/sub2');
+        $response = $client->put('multidir/002/sub3/content.txt', 'Raw Content Here');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/003/sub3/test.png', __DIR__ . '/Data/test.png');
+        $response = $client->put('multidir/002/sub3/json.md', '# Markdown Example');
         $this->assertTrue($response);
 
-        $response = $client->put('multidir/004/complex/test.txt', 'Hello World');
+        $response = $client->mkdir('multidir/002/sub3/subsub');
+        $this->assertTrue($response);
+
+        $response = $client->put('multidir/003/test.png', __DIR__ . '/Data/test.png');
+        $this->assertTrue($response);
+
+        $response = $client->put('multidir/003/test.txt', 'Text Test');
+        $this->assertTrue($response);
+
+        $response = $client->put('multidir/004.json', '{"ping":"pong"}');
         $this->assertTrue($response);
     }
 
@@ -197,14 +206,40 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
         foreach ($response as $item) {
             $this->assertInstanceOf('\Upyun\Util\FileInfo', $item);
-            $this->assertEquals('dir', $item->getType());
         }
 
         $response = $client->ls('multidir/002');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
 
-        $response = $client->ls('multidir/003/sub3');
+        $response = $client->ls('multidir/002/sub3');
         $this->assertInstanceOf('\Upyun\Util\Directory', $response);
+    }
+
+    public function testMultiDirRecursiveList()
+    {
+        global $argv;
+        $options = [
+            'bucket' => $argv[4],
+            'username' => $argv[2],
+            'password' => $argv[3],
+        ];
+        $client = new Upyun\Client($options);
+        $response = $client->ls('multidir', true);
+        foreach ($response as $n) {
+            if ($n->isDir()) {
+                $this->assertInstanceOf('\Upyun\Util\Directory', $n);
+                foreach ($n as $j) {
+                    $this->assertInstanceOf('\Upyun\Util\FileInfo', $j);
+                    if ($j->isDir()) {
+                        foreach ($j as $_j) {
+                            $this->assertInstanceOf('\Upyun\Util\FileInfo', $_j);
+                        }
+                    }
+                }
+            } else {
+                $this->assertInstanceOf('\Upyun\Util\FileInfo', $n);
+            }
+        }
     }
 
     public function testMultiDirDelete()

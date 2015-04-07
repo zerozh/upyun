@@ -7,10 +7,12 @@ class Directory extends FileInfo implements \Countable, \SeekableIterator
 {
     protected $files = [];
     protected $position;
+    protected $recursive = false;
 
-    public function __construct($files)
+    public function __construct($files, $recursive = false)
     {
         $this->files = $files;
+        $this->recursive = $recursive;
     }
 
     public function key()
@@ -30,6 +32,9 @@ class Directory extends FileInfo implements \Countable, \SeekableIterator
 
     public function current()
     {
+        if ($this->recursive && $this->files[$this->position]['type'] == 'dir') {
+            return new Directory($this->files[$this->position]['files']);
+        }
         return new FileInfo($this->files[$this->position]);
     }
 

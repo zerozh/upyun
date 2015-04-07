@@ -10,6 +10,7 @@ Composer 安装：`"zerozh\upyun" : "dev-master"`
 
 请先准备又拍云的操作员帐号，密码，操作空间（Bucket）
 
+### 文件
 ```PHP
 $client = new \Upyun\Client([
     'username' => 'OPERATOR_USERNAME',
@@ -34,6 +35,16 @@ echo $fileinfo->getType(); // string: file|dir
 
 // 删除文件
 $client->delete('somefile.jpg');
+```
+
+### 文件夹
+
+```PHP
+$client = new \Upyun\Client([
+    'username' => 'OPERATOR_USERNAME',
+    'password' => 'OPERATOR_PASSWORD', 
+    'bucket' => 'BUCKET'
+]);
 
 // 创建文件夹
 $client->mkdir('folder/subfolder');
@@ -48,9 +59,36 @@ $files = $client->ls('folder/subfolder');
 foreach($files as $file){
     // 每个文件都为 `\Upyun\Util\FileInfo` 实例
     echo $file->getSize();
-    // 如果遇到文件夹，需要手动遍历（暂不支持递归）
-    if($file->getType == 'dir') {
-        $files = $client->ls('folder/subfolder');
+    // 如果遇到文件夹，需要手动遍历
+    if ($file->isDir()) {
+        $files = $client->ls('folder/subfolder/'. $file->getFilename()) . "\n";
+    }
+}
+```
+
+### 递归文件夹（测试）
+
+```PHP
+$client = new \Upyun\Client([
+    'username' => 'OPERATOR_USERNAME',
+    'password' => 'OPERATOR_PASSWORD', 
+    'bucket' => 'BUCKET'
+]);
+
+// 添加文件
+$client->mkdir('folder/subfolder1');
+$client->put('folder/subfolder2/json.json', '{"ping":"pong"}');
+$client->put('folder/subfolder3.txt', 'Hello World');
+
+// 遍历文件夹
+$files = $client->ls('folder/subfolder', **true**);
+foreach($files as $file){
+    if ($file->isDir()) {
+        foreach($file as $subfile){
+            echo $file->getFilename() . "/" . $subfile->getFilename() . "\n";
+        }
+    } else {
+        echo $file->getFilename() . ' ' . $file->getSize() . "\n";
     }
 }
 
@@ -60,4 +98,3 @@ $client->rmrf('folder');
 
 ## 功能
 * 暂未支持高级图片上传设置
-* 暂未支持递归获取文件夹

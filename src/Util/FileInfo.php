@@ -20,6 +20,22 @@ class FileInfo
     }
 
     /**
+     * @return bool
+     */
+    public function isDir()
+    {
+        return $this->file['type'] == 'dir';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFile()
+    {
+        return $this->file['type'] == 'file';
+    }
+
+    /**
      * @return string filename
      */
     public function getFilename()

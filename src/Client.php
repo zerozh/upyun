@@ -149,10 +149,21 @@ class Client
 
     /**
      * @param string $path Remote file path
+     * @param bool $recursive
      * @return \Upyun\Util\Directory
+     * @throws
      */
-    public function ls($path)
+    public function ls($path, $recursive = false)
     {
+        $fileinfo = $this->head($path);
+        if (!$fileinfo || $fileinfo->isFile()) {
+            throw new BadRequestException('Invalid list directory on a file');
+        }
+
+        if ($recursive) {
+            return $this->recursiveList($path);
+        }
+
         $response = $this->performRequest('GET', $path);
         if ($response->getStatusCode() == 200) {
             return new Directory(Directory::parseBody((string)$response->getBody()));
@@ -173,6 +184,32 @@ class Client
         } else {
             return $this->recursiveDelete($path);
         }
+    }
+
+    /**
+     * @param $path
+     * @return \Upyun\Util\Directory
+     */
+    protected function recursiveList($path)
+    {
+        $files = $this->recursiveRetrieve($path);
+        return new Directory($files, true);
+    }
+
+    /**
+     * @param string $path Dir path
+     * @return array
+     */
+    protected function recursiveRetrieve($path)
+    {
+        $response = $this->performRequest('GET', $path);
+        $files = Directory::parseBody((string)$response->getBody());
+        foreach ($files as &$file) {
+            if ($file['type'] == 'dir') {
+                $file['files'] = $this->recursiveRetrieve($path . '/' . $file['filename']);
+            }
+        }
+        return $files;
     }
 
     /**
